@@ -17,6 +17,14 @@ test('genDiff JSON', () => {
   )).toEqual(readFileSync(getFixturePath('result.txt'), 'utf-8'));
 });
 
+test('genDiff plain', () => {
+  expect(genDiff(
+    parseFile(getFixturePath('file11.json')),
+    parseFile(getFixturePath('file22.json')),
+    'plain',
+  )).toEqual(readFileSync(getFixturePath('result_plain.txt'), 'utf-8'));
+});
+
 test('parseFile yaml', () => {
   expect(
     parseFile(getFixturePath('file11.yml')),
