@@ -9,7 +9,7 @@ const __dirname = dirname(__filename);
 
 const getFixturePath = (filename) => join(__dirname, '..', '__fixtures__', filename);
 
-test('genDiff JSON', () => {
+test('genDiff stylish', () => {
   expect(genDiff(
     parseFile(getFixturePath('file11.json')),
     parseFile(getFixturePath('file22.json')),
@@ -23,6 +23,14 @@ test('genDiff plain', () => {
     parseFile(getFixturePath('file22.json')),
     'plain',
   )).toEqual(readFileSync(getFixturePath('result_plain.txt'), 'utf-8'));
+});
+
+test('genDiff json', () => {
+  expect(genDiff(
+    parseFile(getFixturePath('file11.json')),
+    parseFile(getFixturePath('file22.json')),
+    'json',
+  )).toEqual(readFileSync(getFixturePath('result_json.txt'), 'utf-8'));
 });
 
 test('parseFile yaml', () => {
