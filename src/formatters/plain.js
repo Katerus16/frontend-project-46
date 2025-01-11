@@ -7,12 +7,12 @@ const printValue = (obj) => {
 };
 
 const handleAddedField = (obj, lastObj) => {
-  if (obj.key === lastObj.key && lastObj.action === '-') {
+  if (obj.key === lastObj.key && lastObj.type === 'remove') {
     return [
       `Property '${obj.fullPath}' was updated. From ${printValue(lastObj)} to ${printValue(obj)}`,
     ];
   }
-  if (lastObj.action === '-') {
+  if (lastObj.type === 'remove') {
     return [
       `Property '${lastObj.fullPath}' was removed`,
       `Property '${obj.fullPath}' was added with value: ${printValue(obj)}`,
@@ -24,7 +24,7 @@ const handleAddedField = (obj, lastObj) => {
 };
 
 const handleRemovedOrEqualsField = (obj, lastObj) => {
-  if (obj.key !== lastObj.key && lastObj.action === '-') {
+  if (obj.key !== lastObj.key && lastObj.type === 'remove') {
     return [
       `Property '${lastObj.fullPath}' was removed`,
     ];
@@ -36,13 +36,13 @@ export default (diff) => {
   const result = [];
   let lastObj = {};
   diff.forEach((obj) => {
-    switch (obj.action) {
-      case '+': result.push(...handleAddedField(obj, lastObj)); break;
+    switch (obj.type) {
+      case 'add': result.push(...handleAddedField(obj, lastObj)); break;
       default: result.push(...handleRemovedOrEqualsField(obj, lastObj)); break;
     }
     lastObj = obj;
   });
-  if (lastObj.action === '-') {
+  if (lastObj.type === 'remove') {
     result.push(`Property '${lastObj.fullPath}' was removed`);
   }
   return result.join('\n');

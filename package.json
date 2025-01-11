@@ -1,7 +1,7 @@
 {
   "name": "@hexlet/code",
   "version": "1.0.0",
-  "description": "[![Actions Status](https://github.com/Katerus16/frontend-project-46/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/Katerus16/frontend-project-46/actions)",
+  "description": "generate differences of two files",
   "main": "index.js",
   "type": "module",
   "scripts": {
