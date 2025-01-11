@@ -40,7 +40,7 @@ const genDiffRecursively = (obj1, obj2, fullPath) => {
   return diff;
 };
 
-const genDiff = (filePath1, filePath2, formatterType) => {
+const genDiff = (filePath1, filePath2, formatterType = 'stylish') => {
   const obj1 = parseFile(path.resolve(filePath1));
   const obj2 = parseFile(path.resolve(filePath2));
   const diff = genDiffRecursively(obj1, obj2, '');
