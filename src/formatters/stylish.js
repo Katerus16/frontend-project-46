@@ -1,57 +1,35 @@
 import _ from 'lodash';
 
-const getDepth = (fullPath) => fullPath.split('.').length - 1;
-
 const makeIndent = (depth) => ' '.repeat(4 * depth + 2);
 
-const getMarker = (type) => {
-  switch (type) {
-    case 'add': return '+';
-    case 'remove': return '-';
-    case 'equals': return ' ';
-    default: throw new Error(`Unknown type ${type}`);
-  }
-};
-
-const printObjectFields = (key, obj, action, depth) => {
-  const result = `${makeIndent(depth)}${action} ${key}: {`;
+const printObjectFields = (obj, depth) => {
   const innerFields = _.sortBy(_.keys(obj)).map((innerKey) => (_.isPlainObject(obj[innerKey])
-    ? printObjectFields(innerKey, obj[innerKey], ' ', depth + 1)
-    : `${makeIndent(depth + 1)}  ${innerKey}: ${obj[innerKey]}`)).join('\n');
-  return `${result}\n${innerFields}\n${makeIndent(depth)}  }`;
+    ? `${makeIndent(depth)}  ${innerKey}: ${printObjectFields(obj[innerKey], depth + 1)}`
+    : `${makeIndent(depth)}  ${innerKey}: ${obj[innerKey]}`)).join('\n');
+  return `{\n${innerFields}\n${makeIndent(depth - 1)}  }`;
 };
 
-const printValue = (diffObj) => {
-  const actionMarker = getMarker(diffObj.type);
-  if (_.isPlainObject(diffObj.value)) {
-    if (diffObj.type !== 'equals') {
-      return printObjectFields(
-        diffObj.key,
-        diffObj.value,
-        actionMarker,
-        getDepth(diffObj.fullPath),
-      );
-    }
-    return `${makeIndent(getDepth(diffObj.fullPath))}${actionMarker} ${diffObj.key}:`;
+const printValue = (value, depth) => {
+  if (_.isPlainObject(value)) {
+    return printObjectFields(value, depth + 1);
   }
-  return `${makeIndent(getDepth(diffObj.fullPath))}${actionMarker} ${diffObj.key}: ${diffObj.value}`;
+  return value;
+};
+
+const printDiff = (diffObj, depth) => {
+  switch (diffObj.type) {
+    case 'equals': return `${makeIndent(depth)}  ${diffObj.key}: ${diffObj.innerDiff
+      ? `{\n${diffObj.innerDiff.map((innerObj) => printDiff(innerObj, depth + 1)).join('\n')}\n${makeIndent(depth)}  }`
+      : printValue(diffObj.newValue, depth)}`;
+    case 'update': return `${makeIndent(depth)}- ${diffObj.key}: ${printValue(diffObj.oldValue, depth)}\n`
+      + `${makeIndent(depth)}+ ${diffObj.key}: ${printValue(diffObj.newValue, depth)}`;
+    case 'add': return `${makeIndent(depth)}+ ${diffObj.key}: ${printValue(diffObj.newValue, depth)}`;
+    case 'remove': return `${makeIndent(depth)}- ${diffObj.key}: ${printValue(diffObj.oldValue, depth)}`;
+    default: throw new Error(`Unknown diff type ${diffObj.type}`);
+  }
 };
 
 export default (diff) => {
-  let result = '';
-  let lastDepth = 0;
-  diff.forEach((obj) => {
-    const depth = getDepth(obj.fullPath);
-    if (depth > lastDepth) {
-      result = `${result} {`;
-    }
-    if (depth < lastDepth) {
-      for (let i = lastDepth - 1; i >= depth; i -= 1) {
-        result = `${result}\n${makeIndent(i)}  }`;
-      }
-    }
-    lastDepth = depth;
-    result = `${result}\n${printValue(obj)}`;
-  });
-  return `{${result}\n}`;
+  const result = diff.map((obj) => printDiff(obj, 0)).join('\n');
+  return `{\n${result}\n}`;
 };
