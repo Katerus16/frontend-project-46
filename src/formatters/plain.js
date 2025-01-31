@@ -10,7 +10,8 @@ const printValue = (value) => {
 
 const printDiff = (obj, path) => {
   switch (obj.type) {
-    case 'equals': return obj.innerDiff ? obj.innerDiff.map((innerDiff) => printDiff(innerDiff, `${path}${obj.key}.`)).filter((str) => !_.isEmpty(str)).join('\n') : '';
+    case 'equals': return '';
+    case 'nested': return obj.innerDiff.map((innerDiff) => printDiff(innerDiff, `${path}${obj.key}.`)).filter((str) => !_.isEmpty(str)).join('\n');
     case 'add': return `Property '${path}${obj.key}' was added with value: ${printValue(obj.newValue)}`;
     case 'remove': return `Property '${path}${obj.key}' was removed`;
     case 'update': return `Property '${path}${obj.key}' was updated. From ${printValue(obj.oldValue)} to ${printValue(obj.newValue)}`;

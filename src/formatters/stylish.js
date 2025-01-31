@@ -18,9 +18,9 @@ const printValue = (value, depth) => {
 
 const printDiff = (diffObj, depth) => {
   switch (diffObj.type) {
-    case 'equals': return `${makeIndent(depth)}  ${diffObj.key}: ${diffObj.innerDiff
-      ? `{\n${diffObj.innerDiff.map((innerObj) => printDiff(innerObj, depth + 1)).join('\n')}\n${makeIndent(depth)}  }`
-      : printValue(diffObj.newValue, depth)}`;
+    case 'equals': return `${makeIndent(depth)}  ${diffObj.key}: ${printValue(diffObj.oldValue, depth)}`;
+    case 'nested': return `${makeIndent(depth)}  ${diffObj.key}: {\n`
+      + `${diffObj.innerDiff.map((innerObj) => printDiff(innerObj, depth + 1)).join('\n')}\n${makeIndent(depth)}  }`;
     case 'update': return `${makeIndent(depth)}- ${diffObj.key}: ${printValue(diffObj.oldValue, depth)}\n`
       + `${makeIndent(depth)}+ ${diffObj.key}: ${printValue(diffObj.newValue, depth)}`;
     case 'add': return `${makeIndent(depth)}+ ${diffObj.key}: ${printValue(diffObj.newValue, depth)}`;

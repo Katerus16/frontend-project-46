@@ -2,8 +2,8 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { readFileSync } from 'fs';
 import genDiff from '../index.js';
-import parseFile from '../src/parsers.js';
-import { file11Fixture, file22Fixture } from '../__fixtures__/objs.js';
+import parseContent from '../src/parsers.js';
+import { file11Fixture } from '../__fixtures__/objs.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -22,17 +22,14 @@ test.each([
   )).toEqual(readFileSync(getFixturePath(`result_${format}.txt`), 'utf-8'));
 });
 
-test('parseFile yaml', () => {
+test('parseContent yaml', () => {
   expect(
-    parseFile(getFixturePath('file11.yml')),
+    parseContent(readFileSync(getFixturePath('file11.yml')), 'yaml'),
   ).toEqual(file11Fixture);
-  expect(
-    parseFile(getFixturePath('file22.yaml')),
-  ).toEqual(file22Fixture);
 });
 
-test('parseFile json', () => {
+test('parseContent json', () => {
   expect(
-    parseFile(getFixturePath('file11.json')),
+    parseContent(readFileSync(getFixturePath('file11.json')), 'json'),
   ).toEqual(file11Fixture);
 });
